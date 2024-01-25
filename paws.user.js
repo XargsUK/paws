@@ -13,6 +13,17 @@
 
 $.noConflict();
 
+function getCurrentRegion() {
+    var url = window.location.href;
+    var regionMatch = url.match(/https:\/\/([a-z0-9-]+)\.console\.aws\.amazon\.com/) || url.match(/region=([a-z0-9-]+)/);
+
+    if (regionMatch && regionMatch[1]) {
+        return regionMatch[1];
+    } else {
+        console.error('Paws: Unable to determine AWS region from URL');
+        return 'us-east-1'; // Default to 'us-east-1' if the region can't be determined
+}
+
 var Paws = {};
 
 Paws.App = (function () {
@@ -23,7 +34,11 @@ Paws.App = (function () {
         'home': {href: '/console'},
         // Services
         'cct': {href: '/cloudtrail/home#/events'},
-        'ec2': {href: '/ec2/v2/home#Instances:sort=desc:launchTime'},
+        'ec2': {
+            href: function() {
+                return window.location.origin + '/ec2/v2/home#Instances:sort=desc:launchTime';
+            }
+        },
         'iam': {href: '/iam/home#home'},
         'rds': {href: '/rds/home#dbinstances:'},
         's3': {href: '/s3/home'},
@@ -49,8 +64,27 @@ Paws.App = (function () {
         '/': {focus: '.gwt-TextBox:first'},
         '?': {open: 'https://github.com/xargsuk/paws#shortcuts'},
         // lambda searchbox ???? WIP
-        'lam': {focus: '.inputAndSuggestions.input'}
+        'lam': {focus: '.inputAndSuggestions.input'},
+        'alb': {
+            href: function() {
+                var sessionData = jQuery("meta[name='awsc-session-data']").attr("content");
+                if (!sessionData) {
+                    console.error('Paws: AWS session data not found');
+                    return '#'; // Prevent navigation if the session data isn't found
+                }
+        
+                var sessionDataObject = JSON.parse(sessionData);
+                var currentRegion = sessionDataObject.infrastructureRegion;
+                if (!currentRegion) {
+                    console.error('Paws: Current region not found in session data');
+                    return '#'; // Prevent navigation if the region isn't found
+                }
+        
+                return `https://${currentRegion}.console.aws.amazon.com/ec2/home?region=${currentRegion}#LoadBalancers:v=3`;
+            }
+        }
     };
+        
 
     self.init = function () {
         self.navbar = new Paws.Navbar();
@@ -63,7 +97,15 @@ Paws.App = (function () {
             var command = key;
             command = command.split('').join(' ');
             var callback;
-            if (value['href']) {
+
+            // Handling the 'href' as a function for dynamic URL generation (specifically for 'alb')
+            if (typeof value['href'] === 'function') {
+                callback = function () {
+                    var url = value['href']();
+                    self.log('Redirecting to ' + url);
+                    window.location.href = url;
+                };
+            } else if (value['href']) {
                 callback = function () {
                     self.log('Redirecting to ' + value['href']);
                     window.location.href = value['href'];
@@ -87,6 +129,7 @@ Paws.App = (function () {
             } else {
                 self.log('Invalid callback');
             }
+
             Mousetrap.bind(command, function () {
                 callback();
                 return false;
