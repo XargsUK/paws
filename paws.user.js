@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Paws
 // @namespace    http://tombenner.co/
-// @version      0.0.3
+// @version      0.0.4
 // @description  Keyboard shortcuts for the AWS Console
 // @author       Tom Benner / xargsuk
 // @match        https://*.console.aws.amazon.com/*
@@ -22,6 +22,7 @@ function getCurrentRegion() {
     } else {
         console.error('Paws: Unable to determine AWS region from URL');
         return 'us-east-1'; // Default to 'us-east-1' if the region can't be determined
+    }
 }
 
 var Paws = {};
@@ -31,60 +32,60 @@ Paws.App = (function () {
 
     self.commandsCallbacks = {
         //Home
-        'home': {href: '/console'},
+        'home': { href: '/console' },
         // Services
-        'cct': {href: '/cloudtrail/home#/events'},
+        'cct': { href: '/cloudtrail/home#/events' },
         'ec2': {
-            href: function() {
+            href: function () {
                 return window.location.origin + '/ec2/v2/home#Instances:sort=desc:launchTime';
             }
         },
-        'iam': {href: '/iam/home#home'},
-        'rds': {href: '/rds/home#dbinstances:'},
-        's3': {href: '/s3/home'},
-        'vpc': {href: '/vpc/home'},
-        'cfn': {href: '/cloudformation/home'},
-        'clf': {href: '/cloudfront/v3/home'},
-        'cd': {href: '/codesuite/codedeploy'},
-        'cp': {href: '/codesuite/codepipeline'},
-        'ssm': {href: '/systems-manager/home'},
-        'da': {href: '/lambda/home'},
-        'org': {href: '/organizations'},
-        'cw': {href: '/cloudwatch'},
+        'iam': { href: '/iam/home#home' },
+        'rds': { href: '/rds/home#dbinstances:' },
+        's3': { href: '/s3/home' },
+        'vpc': { href: '/vpc/home' },
+        'cfn': { href: '/cloudformation/home' },
+        'clf': { href: '/cloudfront/v3/home' },
+        'cd': { href: '/codesuite/codedeploy' },
+        'cp': { href: '/codesuite/codepipeline' },
+        'ssm': { href: '/systems-manager/home' },
+        'da': { href: '/lambda/home' },
+        'org': { href: '/organizations' },
+        'cw': { href: '/cloudwatch' },
         // Pages
-        'elb': {href: '/ec2/v2/home#LoadBalancers:'},
-        'sg': {href: '/ec2/v2/home#SecurityGroups:sort=groupId'},
+        'elb': { href: '/ec2/v2/home#LoadBalancers:' },
+        'sg': { href: '/ec2/v2/home#SecurityGroups:sort=groupId' },
         // Navbar
-        'j': {func: ['navbar', 'next']},
-        'k': {func: ['navbar', 'prev']},
-        'l': {func: ['navbar', 'select']},
-        'r': {func: ['navbar', 'toggleRegionSelection']}, // Region selection
-        'return': {func: ['navbar', 'select']}, // This doesn't work on some services
+        'j': { func: ['navbar', 'next'] },
+        'k': { func: ['navbar', 'prev'] },
+        'l': { func: ['navbar', 'select'] },
+        'r': { func: ['navbar', 'toggleRegionSelection'] }, // Region selection
+        'return': { func: ['navbar', 'select'] }, // This doesn't work on some services
         // Miscellaneous
-        '/': {focus: '.gwt-TextBox:first'},
-        '?': {open: 'https://github.com/xargsuk/paws#shortcuts'},
+        '/': { focus: '.gwt-TextBox:first' },
+        '?': { open: 'https://github.com/xargsuk/paws#shortcuts' },
         // lambda searchbox ???? WIP
-        'lam': {focus: '.inputAndSuggestions.input'},
+        'lam': { focus: '.inputAndSuggestions.input' },
         'alb': {
-            href: function() {
+            href: function () {
                 var sessionData = jQuery("meta[name='awsc-session-data']").attr("content");
                 if (!sessionData) {
                     console.error('Paws: AWS session data not found');
                     return '#'; // Prevent navigation if the session data isn't found
                 }
-        
+
                 var sessionDataObject = JSON.parse(sessionData);
                 var currentRegion = sessionDataObject.infrastructureRegion;
                 if (!currentRegion) {
                     console.error('Paws: Current region not found in session data');
                     return '#'; // Prevent navigation if the region isn't found
                 }
-        
+
                 return `https://${currentRegion}.console.aws.amazon.com/ec2/home?region=${currentRegion}#LoadBalancers:v=3`;
             }
         }
     };
-        
+
 
     self.init = function () {
         self.navbar = new Paws.Navbar();
