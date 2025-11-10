@@ -35,6 +35,17 @@ Open the default view of a service.
 | Lambda | da |
 | Organizations | org |
 | CloudWatch | cw |
+| ECS | ecs |
+| EKS | eks |
+| ECR | ecr |
+| DynamoDB | ddb |
+| ElastiCache | elc |
+| Route 53 | r53 |
+| API Gateway | api |
+| Secrets Manager | sec |
+| Parameter Store | par |
+| Billing | bil |
+| Cost Explorer | cost |
 
 ### Pages
 

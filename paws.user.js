@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Paws
 // @namespace    http://tombenner.co/
-// @version      0.2.0
+// @version      0.3.1
 // @description  Keyboard shortcuts for the AWS Console
 // @author       Tom Benner / xargsuk
 // @match        https://*.console.aws.amazon.com/*
@@ -117,6 +117,178 @@ const Paws = {
         return queryIndex === queryLower.length;
     }
 };
+
+class HelpOverlay {
+    constructor() {
+        this.modal = null;
+    }
+
+    show() {
+        if (this.modal) {
+            this.modal.remove();
+        }
+
+        this.createModal();
+    }
+
+    createModal() {
+        // Detect theme
+        const awscTheme = $('html').attr('awsc-color-theme') ||
+                         $('body').attr('awsc-color-theme') ||
+                         localStorage.getItem('awsc-color-theme');
+
+        let isDarkTheme = false;
+        if (awscTheme === 'dark') {
+            isDarkTheme = true;
+        } else if (awscTheme === 'default' || !awscTheme) {
+            isDarkTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        if ($('html').hasClass('awsui-dark-mode')) {
+            isDarkTheme = true;
+        }
+
+        const theme = {
+            bg: isDarkTheme ? '#2d2d2d' : '#fff',
+            text: isDarkTheme ? '#e0e0e0' : '#000',
+            textMuted: isDarkTheme ? '#a0a0a0' : '#666',
+            border: isDarkTheme ? '#444' : '#ddd',
+            accent: isDarkTheme ? '#5cb3ff' : '#0073bb',
+            headerBg: isDarkTheme ? '#1e1e1e' : '#f5f5f5'
+        };
+
+        // Create overlay
+        this.modal = $('<div>')
+            .attr('id', 'paws-help-overlay')
+            .css({
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: isDarkTheme ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.7)',
+                zIndex: 999999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            })
+            .on('click', (e) => {
+                if ($(e.target).is('#paws-help-overlay')) {
+                    this.close();
+                }
+            });
+
+        // Create container
+        const container = $('<div>')
+            .css({
+                backgroundColor: theme.bg,
+                borderRadius: '8px',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+                width: '90%',
+                maxWidth: '800px',
+                maxHeight: '80vh',
+                overflow: 'auto',
+                fontFamily: 'system-ui, -apple-system, sans-serif'
+            });
+
+        // Header
+        const header = $('<div>')
+            .css({
+                padding: '20px',
+                borderBottom: `1px solid ${theme.border}`,
+                backgroundColor: theme.headerBg
+            })
+            .html(`
+                <h2 style="margin: 0; color: ${theme.text}; font-size: 24px;">🐾 Paws Keyboard Shortcuts</h2>
+                <p style="margin: 8px 0 0 0; color: ${theme.textMuted}; font-size: 14px;">Press ESC or click outside to close</p>
+            `);
+
+        // Content
+        const content = $('<div>')
+            .css({
+                padding: '20px'
+            })
+            .html(`
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    ${this.createSection('Services', [
+                        ['home', 'Home'],
+                        ['ec2', 'EC2 Instances'],
+                        ['s3', 'S3'],
+                        ['rds', 'RDS'],
+                        ['iam', 'IAM'],
+                        ['vpc', 'VPC'],
+                        ['da', 'Lambda'],
+                        ['cfn', 'CloudFormation'],
+                        ['ct / cct', 'CloudTrail'],
+                        ['cw', 'CloudWatch'],
+                        ['ecs', 'ECS'],
+                        ['eks', 'EKS'],
+                        ['ecr', 'ECR'],
+                        ['ddb', 'DynamoDB'],
+                        ['elc', 'ElastiCache'],
+                        ['r53', 'Route 53'],
+                        ['api', 'API Gateway'],
+                        ['sec', 'Secrets Manager'],
+                        ['par', 'Parameter Store'],
+                        ['bil', 'Billing'],
+                        ['cost', 'Cost Explorer']
+                    ], theme)}
+                    ${this.createSection('Pages', [
+                        ['pam', 'AMIs'],
+                        ['peb', 'EBS Volumes'],
+                        ['pel / elb', 'Load Balancers (Classic)'],
+                        ['alb', 'Load Balancers (ALB/NLB)'],
+                        ['psg / sg', 'Security Groups']
+                    ], theme)}
+                    ${this.createSection('Navigation', [
+                        ['j', 'Next nav link'],
+                        ['k', 'Previous nav link'],
+                        ['l / return', 'Select nav link']
+                    ], theme)}
+                    ${this.createSection('Miscellaneous', [
+                        ['?', 'Show this help'],
+                        ['/', 'Focus search box'],
+                        ['r', 'Region dropdown'],
+                        ['rr', 'Fuzzy region search']
+                    ], theme)}
+                </div>
+            `);
+
+        container.append(header).append(content);
+        this.modal.append(container);
+        $('body').append(this.modal);
+
+        // Close on ESC
+        $(document).on('keydown.paws-help', (e) => {
+            if (e.key === 'Escape') {
+                this.close();
+            }
+        });
+    }
+
+    createSection(title, shortcuts, theme) {
+        const items = shortcuts.map(([key, desc]) =>
+            `<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid ${theme.border};">
+                <span style="color: ${theme.textMuted}; font-size: 14px;">${desc}</span>
+                <code style="background: ${theme.headerBg}; padding: 2px 8px; border-radius: 4px; color: ${theme.accent}; font-size: 13px;">${key}</code>
+            </div>`
+        ).join('');
+
+        return `
+            <div>
+                <h3 style="margin: 0 0 12px 0; color: ${theme.text}; font-size: 16px; font-weight: 600;">${title}</h3>
+                <div>${items}</div>
+            </div>
+        `;
+    }
+
+    close() {
+        if (this.modal) {
+            $(document).off('keydown.paws-help');
+            this.modal.remove();
+            this.modal = null;
+        }
+    }
+}
 
 class RegionSelector {
     constructor() {
@@ -427,6 +599,7 @@ class PawsApp {
     constructor() {
         this.navbar = new PawsNavbar();
         this.regionSelector = new RegionSelector();
+        this.helpOverlay = new HelpOverlay();
         this.commandsCallbacks = {
             // Home
             'home': { href: '/console' },
@@ -448,6 +621,22 @@ class PawsApp {
             'da': { href: '/lambda/home' },
             'org': { href: '/organizations' },
             'cw': { href: '/cloudwatch' },
+            // Container Services
+            'ecs': { href: '/ecs/home' },
+            'eks': { href: '/eks/home' },
+            'ecr': { href: '/ecr/repositories' },
+            // Databases
+            'ddb': { href: '/dynamodbv2/home' },
+            'elc': { href: '/elasticache/home' },
+            // Networking
+            'r53': { href: '/route53/home' },
+            'api': { href: '/apigateway/main/apis' },
+            // Security & Secrets
+            'sec': { href: '/secretsmanager/home' },
+            'par': { href: '/systems-manager/parameters' },
+            // Billing
+            'bil': { href: '/billing/home' },
+            'cost': { href: '/cost-management/home' },
             // Pages
             'pam': { href: '/ec2/v2/home#Images:visibility=owned-by-me' },
             'peb': { href: '/ec2/v2/home#Volumes:' },
@@ -465,7 +654,7 @@ class PawsApp {
             'rr': { func: () => this.regionSelector.show() },
             // Miscellaneous
             '/': { focus: '.gwt-TextBox:first' },
-            '?': { open: 'https://github.com/xargsuk/paws#shortcuts' },
+            '?': { func: () => this.helpOverlay.show() },
             // Lambda searchbox
             'lam': { focus: '.inputAndSuggestions.input' },
             'alb': {
