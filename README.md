@@ -66,6 +66,7 @@ Use the left sidebar navigation menu.
 | Focus search box | / |
 | Focus Lambda search box | lam |
 | Toggle region menu dropdown | r |
+| Fuzzy search and switch region | rr |
 
 ## Licence
 
