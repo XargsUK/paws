@@ -1,78 +1,77 @@
-Paws
-====
+# Paws
+
 Keyboard shortcuts for the AWS Console
 
-Overview
---------
+## Overview
 
 Paws adds Vim-like keyboard shortcuts to the AWS Management Console.
 
+## Installation
 
-Installation
-------------
+Paws can be used by installing [paws](https://github.com/XargsUK/paws/raw/master/paws.user.js)
+in [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en) (Chrome)
+or [Greasemonkey](https://addons.mozilla.org/en-us/firefox/addon/greasemonkey/) (Firefox).
 
-Paws can be used by installing [paws](https://github.com/XargsUK/paws/raw/master/paws.user.js) in [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en) (Chrome) or [Greasemonkey](https://addons.mozilla.org/en-us/firefox/addon/greasemonkey/) (Firefox).
-
-Shortcuts
----------
+## Shortcuts
 
 ### Services
 
 Open the default view of a service.
 
-<table>
-  <tr><td>Home</td><td>home</td></tr>
-  <tr><td>CloudTrail</td><td>ct</td></tr>
-  <tr><td>EC2</td><td>ec2</td></tr>
-  <tr><td>IAM</td><td>iam</td></tr>
-  <tr><td>RDS</td><td>rds</td></tr>
-  <tr><td>S3</td><td>s3</td></tr>
-  <tr><td>VPC</td><td>vpc</td></tr>
-  <tr><td>Cloudformation</td><td>cfn</td></tr>
-  <tr><td>CodeDeploy</td><td>cd</td></tr>
-  <tr><td>CodePipeline</td><td>cp</td></tr>
-  <tr><td>Systems Manager</td><td>ssm</td></tr>
-  <tr><td>Lambda</td><td>da</td></tr>
-  <tr><td>Organizations</td><td>org</td></tr>
-  <tr><td>CloudWatch</td><td>cw</td></tr>
-  <tr><td>EC2 Security Groups</td><td>sg</td></tr>
-</table>
+| Service | Shortcut |
+|---------|----------|
+| Home | home |
+| CloudTrail | ct / cct |
+| EC2 | ec2 |
+| IAM | iam |
+| RDS | rds |
+| S3 | s3 |
+| VPC | vpc |
+| CloudFormation | cfn |
+| CloudFront | clf |
+| CodeDeploy | cd |
+| CodePipeline | cp |
+| Systems Manager | ssm |
+| Lambda | da |
+| Organizations | org |
+| CloudWatch | cw |
 
 ### Pages
 
 Open a specific page within a service.
 
-<table>
-  <tr><td>AMIs</td><td>pam</td></tr>
-  <tr><td>EBS</td><td>peb</td></tr>
-  <tr><td>ELBs</td><td>pel</td></tr>
-  <tr><td>Security Groups</td><td>psg</td></tr>
-</table>
+| Page | Shortcut |
+|------|----------|
+| AMIs | pam |
+| EBS Volumes | peb |
+| Load Balancers (Classic) | pel / elb |
+| Load Balancers (ALB/NLB) | alb |
+| Security Groups | psg / sg |
 
 ### Sidebar navigation
 
 Use the left sidebar navigation menu.
 
-<table>
-  <tr><td>Select next nav link</td><td>j</td></tr>
-  <tr><td>Select previous nav link</td><td>k</td></tr>
-  <tr><td>Click on selected nav link</td><td>return</td></tr>
-</table>
+| Action | Shortcut |
+|--------|----------|
+| Select next nav link | j |
+| Select previous nav link | k |
+| Click on selected nav link | l / return |
 
 ### Miscellaneous
 
-<table>
-  <tr><td>Show shortcuts</td><td>?</td></tr>
-  <tr><td>Focus search box</td><td>/</td></tr>
-  <tr><td>Region menu dropdown</td><td>j</td></tr>
-</table>
+| Action | Shortcut |
+|--------|----------|
+| Show shortcuts | ? |
+| Focus search box | / |
+| Focus Lambda search box | lam |
+| Toggle region menu dropdown | r |
 
-License
--------
+## Licence
 
-Paws is released under the MIT License. Please see the MIT-LICENSE file for details.
+Paws is released under the MIT Licence. Please see the LICENSE.md file for details.
 
-Credits
--------
+## Credits
 
-This is a fork of the project [paws](https://github.com/tombenner/paws). All credit goes to [tombenner](https://github.com/tombenner/)
+This is a fork of the project [paws](https://github.com/tombenner/paws).
+All credit for the original project goes to [tombenner](https://github.com/tombenner/).
